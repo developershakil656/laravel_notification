@@ -52,6 +52,23 @@
                                 </li>
                             @endif
                         @else
+
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Notifications
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown" style="width: 300px;">
+                                    @foreach(Auth::user()->notifications as $notification)
+                                        @if($notification->read_at)
+                                            <p>{{$notification->data['msg']}}</p>
+                                        @else
+                                            <p style="font-weight: bold;">{{$notification->data['msg']}}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}

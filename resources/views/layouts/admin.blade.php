@@ -9,15 +9,10 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    @notifyCss
+
 </head>
 <body>
     <div id="app">
@@ -48,6 +43,22 @@
                             
                         @else
                             <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre onclick="deleteNotification()">
+                                    Notifications <span style="font-weight: bold;" id="notification"></span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown" style="width: 300px;">
+                                    @foreach(Auth::guard('admin')->user()->notifications as $notification)
+                                        @if($notification->read_at)
+                                            <p>{{$notification->data['msg']}}</p>
+                                        @else
+                                            <p style="font-weight: bold;">{{$notification->data['msg']}}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::guard('admin')->user()->name }}
                                 </a>
@@ -74,5 +85,42 @@
             @yield('content')
         </main>
     </div>
+
+ <!-- Scripts -->
+ <script src="{{ mix('js/app.js') }}"></script>
+ @notifyJs
+ 
+    <script>
+
+        const element = document.getElementById("notification");
+        if(localStorage.getItem('total')){
+                element.innerHTML  = localStorage.getItem('total');
+        }
+        
+        //laravel echo for brodcasting
+        Echo.channel(`new-user`)
+        .listen('NewUserCreatedEvent', (e) => {
+            toastr.info('<a href="http://127.0.0.1:8000/user/id">'+ e.user.name + ' has joined!' +'</a>');
+            
+            if(!localStorage.getItem('total')){
+                localStorage.setItem('total',1);
+                element.innerHTML  = localStorage.getItem('total');
+            }else{
+                var total= localStorage.getItem('total');
+                localStorage.setItem('total',++total);
+                
+                element.innerHTML  = localStorage.getItem('total');
+            }
+        });
+
+        //notification delete
+        function deleteNotification() {
+            localStorage.removeItem('total');
+            element.innerHTML  = null;
+        }
+        
+        
+    </script>
+    <x:notify-messages />
 </body>
 </html>

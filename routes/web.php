@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,16 +15,16 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+
+
 Route::get('/', function () {
     return view('welcome');
 });
 
 Auth::routes();
-
 Route::get('/dashbord', [App\Http\Controllers\HomeController::class, 'index'])->name('dashbord');
 
 route::prefix('admin')->group(function () {
-
     #admin login
     Route::get('/login', [App\Http\Controllers\Admin\LoginController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login', [App\Http\Controllers\Admin\LoginController::class, 'login'])->name('admin.login');
@@ -36,4 +37,21 @@ route::prefix('admin')->group(function () {
         #dashbord
         Route::get('/dashbord', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashbord');
     });
+});
+
+
+#clear all cache
+Route::get('clear-cache',function(){
+    Artisan::call('cache:clear');
+
+    Artisan::call('config:cache');
+    Artisan::call('config:clear');
+
+    // Artisan::call('route:cache');
+    Artisan::call('route:clear');
+
+    Artisan::call('view:cache');
+    Artisan::call('view:clear');
+
+    echo 'all cache cleared';
 });
